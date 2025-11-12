@@ -133,15 +133,23 @@ def cluster_insights():
                         'std': float(cluster_data[col].std())
                     }
 
-                    # Tentukan karakteristik kolom (High/Medium/Low)
+                    # Menggunakan z-score dengan threshold yang lebih jelas dan tidak overlap
                     if overall_std > 0:
                         z_score = (mean_val - overall_mean) / overall_std
-                        if z_score > 0.2:
+                        
+                        # Definisi yang lebih jelas:
+                        # HIGH: z_score > 0.5 (jauh di atas rata-rata)
+                        # MEDIUM: -0.5 <= z_score <= 0.5 (sekitar rata-rata)
+                        # LOW: z_score < -0.5 (jauh di bawah rata-rata)
+                        if z_score > 0.5:
                             characteristics.append(f"High {col}")
-                        elif z_score < -0.2:
+                        elif z_score < -0.5:
                             characteristics.append(f"Low {col}")
-                        elif abs(z_score) > 0.05:
+                        else:
                             characteristics.append(f"Medium {col}")
+                    else:
+                        # Jika std = 0 (semua data sama), kategorikan sebagai Medium
+                        characteristics.append(f"Medium {col}")
 
             # Analisis genre
             genre_analysis = {}
