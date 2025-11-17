@@ -4,7 +4,9 @@ import pandas as pd
 import numpy as np
 import os
 from werkzeug.utils import secure_filename
-
+import json
+import ast
+from collections import Counter
 
 # Inisialisasi Flask
 app = Flask(__name__)
@@ -157,13 +159,27 @@ def cluster_insights():
                 all_genres = []
                 for genres_str in cluster_data['genres'].dropna():
                     if isinstance(genres_str, str):
-                        genres = [g.strip() for g in str(genres_str).split(',')]
-                        all_genres.extend(genres)
+                        try:
+                            # Handles both "['Action', 'Crime']" and comma-separated "Action, Crime"
+                            genres_str_clean = str(genres_str).strip()
+                            if genres_str_clean.startswith('['):
+                                # Format: "['Action', 'Crime']" - parse as Python literal
+                                genres = ast.literal_eval(genres_str_clean)
+                                if not isinstance(genres, list):
+                                    genres = [genres]
+                            else:
+                                # Format: "Action, Crime" - split by comma
+                                genres = [g.strip().strip("'\"") for g in genres_str_clean.split(',')]
+                            all_genres.extend(genres)
+                        except (ValueError, SyntaxError):
+                            # Jika parse gagal, fallback ke split biasa
+                            genres = [g.strip().strip("'\"") for g in genres_str.split(',')]
+                            all_genres.extend(genres)
+                
                 if all_genres:
-                    from collections import Counter
                     genre_counts = Counter(all_genres)
                     sorted_genres = sorted(genre_counts.items(), key=lambda x: (-x[1], x[0]))
-                    dominant_genre = [sorted_genres[0][0]] if sorted_genres else []
+                    dominant_genre = sorted_genres[0][0] if sorted_genres else None
                     genre_analysis = {
                         'dominant_genres': dominant_genre,
                         'genre_distribution': dict(sorted_genres[:5])

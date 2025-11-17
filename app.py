@@ -19,7 +19,7 @@ st.set_page_config(
     page_icon="🎬",                        # Icon tab
     layout="wide",                         # Layout lebar penuh
     initial_sidebar_state="expanded",      # Sidebar 
-    menu_items={'About': "Analisis Clustering Film"}
+    menu_items={'About': "Film Clustering Analysis"}
 )
 
 
@@ -86,8 +86,8 @@ with st.sidebar:
     
     # Navigasi antar halaman
     page = st.radio(
-        "Navigation",
-        ["🏠 Home", "📤 Unggah Data", "⚙️ Clustering", "📊 Hasil", "📈 Evaluasi", "💡 Interpretasi"],
+        "Navigasi",
+        ["🏠 Beranda", "📤 Unggah Data", "⚙️ Clustering", "📊 Hasil", "📈 Evaluasi", "💡 Interpretasi"],
         label_visibility="collapsed"
     )
     
@@ -100,13 +100,13 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 #  HALAMAN HOME
-if page == "🏠 Home":
+if page == "🏠 Beranda":
     # Header dan deskripsi aplikasi
     st.markdown(
         """
         <div style="display:flex; align-items:center; gap:12px; padding: 8px 0;">
             <div style="font-size:52px; line-height:1;">🎬</div>
-            <h1 style="margin:0; font-size:32px;">Analisis Film Clustering</h1>
+            <h1 style="margin:0; font-size:32px;">Analisis Clustering Film</h1>
         </div>
         """,
         unsafe_allow_html=True
@@ -128,11 +128,11 @@ if page == "🏠 Home":
     # Informasi fitur utama
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("📊 Formats", "CSV, XLSX")
+        st.metric("📊 Format", "CSV, XLSX")
     with col2:
-        st.metric("🤖 Algorithms", "K-Means, DBSCAN")
+        st.metric("🤖 Algoritma", "K-Means, DBSCAN")
     with col3:
-        st.metric("📈 Max Size", "50 MB")
+        st.metric("📈 Ukuran Max", "50 MB")
     
     st.markdown("---")
     
@@ -140,25 +140,25 @@ if page == "🏠 Home":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("### ✨ Key Features")
+        st.markdown("### ✨ Fitur Utama")
         features = [
-            "📁 CSV & XLSX",
+            "📁 Dukungan CSV & XLSX",
             "🔄 K-Means & DBSCAN",
-            "📊 Visualisasi 2D",
-            "📈 Kualitas Metrik",
-            "💡 Interpretasi"
+            "📊 Visualisasi 3D",
+            "📈 Metrik Kualitas",
+            "💡 Insights"
         ]
         for feature in features:
             st.markdown(f"• {feature}")
     
     with col2:
-        st.markdown("### 🚀 Quick Start")
+        st.markdown("### 🚀 Mulai Cepat")
         steps = [
-            "1. Unggah dataset",
+            "1. Unggah dataset Anda",
             "2. Pilih fitur",
-            "3. Lakukan clustering",
-            "4. Review Hasil",
-            "5. Interpretasi"
+            "3. Konfigurasi clustering",
+            "4. Lihat hasil",
+            "5. Ekspor insights"
         ]
         for step in steps:
             st.markdown(f"• {step}")
@@ -166,14 +166,14 @@ if page == "🏠 Home":
 
 #  HALAMAN UPLOAD DATA
 elif page == "📤 Unggah Data":
-    st.markdown("# 📤 UnggahFilm Data")
+    st.markdown("# 📤 Unggah Data Film")
     st.markdown("---")
     
     # Upload file CSV/XLSX
     uploaded_file = st.file_uploader(
         "Pilih file CSV atau XLSX",
         type=["csv", "xlsx"],
-        help="Upload your film dataset"
+        help="Unggah dataset film Anda"
     )
     
     # Jika file sudah diupload
@@ -183,7 +183,7 @@ elif page == "📤 Unggah Data":
             files = {'file': (uploaded_file.name, uploaded_file.getbuffer(), uploaded_file.type)}
             backend_url = "http://backend:5000/api/upload"  # Endpoint Flask untuk upload file
             
-            with st.spinner("Uploading file..."):
+            with st.spinner("Mengunggah file..."):
                 response = requests.post(backend_url, files=files)  # Kirim file ke backend Flask
             
             if response.status_code == 200:
@@ -199,22 +199,22 @@ elif page == "📤 Unggah Data":
                 st.session_state.data = df
                 st.session_state.uploaded_filename = result['filename']
                 
-                st.success(f"✅ File Berhasil DiUpload!")
+                st.success(f"✅ File berhasil diunggah!")
                 
                 # Tampilkan ringkasan dataset
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.metric("📊 Jumlah Data", f"{len(df):,}")
+                    st.metric("📊 Baris", f"{len(df):,}")
                 with col2:
                     st.metric("📋 Kolom", len(df.columns))
                 with col3:
                     st.metric("🔢 Numerik", len(df.select_dtypes(include=[np.number]).columns))
                 with col4:
-                    st.metric("📝 Text", len(df.select_dtypes(include=['object']).columns))
+                    st.metric("📝 Teks", len(df.select_dtypes(include=['object']).columns))
                 
                 # Preview data
                 st.markdown("---")
-                st.markdown("### Data Preview")
+                st.markdown("### Pratinjau Data")
                 st.dataframe(df.head(10), use_container_width=True)
                 
                 # Statistik dan info kolom
@@ -223,10 +223,10 @@ elif page == "📤 Unggah Data":
                     st.markdown("### Statistik")
                     st.dataframe(df.describe(), use_container_width=True)
                 with col2:
-                    st.markdown("### Infomarsi Kolom")
+                    st.markdown("### Informasi Kolom")
                     col_info = pd.DataFrame({
-                        'Column': df.columns,
-                        'Type': df.dtypes,
+                        'Kolom': df.columns,
+                        'Tipe': df.dtypes,
                         'Non-Null': df.count(),
                         'Null': df.isnull().sum()
                     })
@@ -234,24 +234,24 @@ elif page == "📤 Unggah Data":
             else:
                 # Jika upload gagal
                 error_msg = response.json().get('error', 'Unknown error')
-                st.error(f"Upload failed: {error_msg}")
+                st.error(f"Gagal mengunggah: {error_msg}")
         
         except requests.exceptions.ConnectionError:
-            st.error("Cannot connect to backend. Make sure Flask is running on http://backend:5000")
+            st.error("Tidak dapat terhubung ke backend. Pastikan Flask berjalan di http://backend:5000")
         except Exception as e:
             st.error(f"Error: {str(e)}")
     else:
-        st.info("👆 Untuk memulai Upload File CSV atau XLSX")
+        st.info("👆 Unggah file CSV atau XLSX untuk memulai")
 
 
 #  HALAMAN CLUSTERING
 elif page == "⚙️ Clustering":
-    st.markdown("# ⚙️ Configure Clustering")
+    st.markdown("# ⚙️ Konfigurasi Clustering")
     st.markdown("---")
     
     # Jika belum ada data, minta upload dulu
     if st.session_state.data is None:
-        st.warning("⚠️ Please upload data first")
+        st.warning("⚠️ Silakan unggah data terlebih dahulu")
     else:
         df = st.session_state.data
         # Ambil hanya kolom numerik (karena clustering butuh angka)
@@ -261,12 +261,12 @@ elif page == "⚙️ Clustering":
         numeric_cols = [col for col in numeric_cols if col.lower() != 'id']
         
         if len(numeric_cols) == 0:
-            st.error("❌ No numeric columns found")
+            st.error("❌ Tidak ada kolom numerik yang ditemukan")
         else:
             # Pilih fitur yang akan digunakan untuk clustering
-            st.markdown("### 🎯 Select Features")
+            st.markdown("### 🎯 Pilih Fitur")
             selected_features = st.multiselect(
-                "Pilih fitur numerik untuk clustering",
+                "Pilih kolom numerik",
                 numeric_cols,
                 default=numeric_cols[:min(3, len(numeric_cols))]  # default 3 kolom pertama
             )
@@ -287,14 +287,14 @@ elif page == "⚙️ Clustering":
                 with col1:
                     st.markdown("**Sebelum Normalisasi:**")
                     before_stats = pd.DataFrame({
-                        'Feature': selected_features,
-                        'Mean': X.mean().values,
+                        'Fitur': selected_features,
+                        'Rata-rata': X.mean().values,
                         'Min': X.min().values,
                         'Max': X.max().values
                     })
                     # Format angka agar lebih rapi
                     before_stats_display = before_stats.copy()
-                    for c in ['Mean', 'Min', 'Max']:
+                    for c in ['Rata-rata', 'Min', 'Max']:
                         before_stats_display[c] = before_stats_display[c].apply(lambda x: f"{x:.4f}")
                     st.dataframe(before_stats_display, use_container_width=True, hide_index=True)
                 
@@ -307,13 +307,13 @@ elif page == "⚙️ Clustering":
                 with col2:
                     st.markdown("**Setelah Normalisasi:**")
                     after_stats = pd.DataFrame({
-                        'Feature': selected_features,
-                        'Mean': X_scaled.mean(axis=0),
+                        'Fitur': selected_features,
+                        'Rata-rata': X_scaled.mean(axis=0),
                         'Min': X_scaled.min(axis=0),
                         'Max': X_scaled.max(axis=0)
                     })
                     after_stats_display = after_stats.copy()
-                    for c in ['Mean', 'Min', 'Max']:
+                    for c in ['Rata-rata', 'Min', 'Max']:
                         after_stats_display[c] = after_stats_display[c].apply(lambda x: f"{x:.4f}")
                     st.dataframe(after_stats_display, use_container_width=True, hide_index=True) #Menampilkan 4 angka dibelakang koma
                 
@@ -326,10 +326,10 @@ elif page == "⚙️ Clustering":
                 # PILIH ALGORITMA
                 # ---------------------------------------
                 st.markdown("---")
-                st.markdown("### 🔧 Pemilihan Algoritma")
+                st.markdown("### 🔧 Pilih Algoritma")
                 
                 algorithm = st.radio(
-                    "Pilih algoritma clustering",
+                    "Pilih algoritma",
                     ["K-Means", "DBSCAN"],
                     horizontal=True,
                     label_visibility="collapsed"
@@ -341,17 +341,17 @@ elif page == "⚙️ Clustering":
                 #  K-MEANS CLUSTERING
                 # =======================================
                 if algorithm == "K-Means":
-                    st.markdown("### ⚙️ K-Means Parameters")
+                    st.markdown("### ⚙️ Parameter K-Means")
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        n_clusters = st.slider("Number of clusters", 2, 10, 3)
+                        n_clusters = st.slider("Jumlah cluster", 2, 10, 3)
                     with col2:
                         random_state = st.number_input("Random state", value=42)
                     
                     # Jalankan clustering
-                    if st.button("🚀 Run K-Means", use_container_width=True, type="primary"):
-                        with st.spinner("Running K-Means..."):
+                    if st.button("🚀 Jalankan K-Means", use_container_width=True, type="primary"):
+                        with st.spinner("Menjalankan K-Means..."):
                             kmeans = KMeans(n_clusters=n_clusters, random_state=int(random_state), n_init=10)
                             clusters = kmeans.fit_predict(X_scaled)     # hasil label cluster
                             st.session_state.clusters = clusters
@@ -376,22 +376,22 @@ elif page == "⚙️ Clustering":
                             except:
                                 pass  # lanjut walau gagal simpan
                             
-                            st.success(f"✅ K-Means completed! Found {n_clusters} clusters")
+                            st.success(f"✅ K-Means selesai! Ditemukan {n_clusters} cluster")
                 
                 # =======================================
                 #  DBSCAN CLUSTERING
                 # =======================================
                 else:
-                    st.markdown("### ⚙️ DBSCAN Parameters")
+                    st.markdown("### ⚙️ Parameter DBSCAN")
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        min_samples = st.slider("Minimum samples", 2, 30, 5)
+                        min_samples = st.slider("Minimum samples", 2,30, 5)
                     with col2:
                         eps = st.slider("Epsilon (eps)", 0.01, 1.5, 0.5, 0.01)
                     
-                    if st.button("🚀 Run DBSCAN", use_container_width=True, type="primary"):
-                        with st.spinner("Running DBSCAN..."):
+                    if st.button("🚀 Jalankan DBSCAN", use_container_width=True, type="primary"):
+                        with st.spinner("Menjalankan DBSCAN..."):
                             dbscan = DBSCAN(eps=eps, min_samples=int(min_samples))
                             clusters = dbscan.fit_predict(X_scaled)
                             st.session_state.clusters = clusters
@@ -420,9 +420,9 @@ elif page == "⚙️ Clustering":
                             n_clusters = len(set(clusters)) - (1 if -1 in clusters else 0)
                             n_noise = list(clusters).count(-1)
                             
-                            st.success(f"✅ DBSCAN completed! {n_clusters} clusters, {n_noise} noise points")
+                            st.success(f"✅ DBSCAN selesai! {n_clusters} cluster, {n_noise} titik noise")
             else:
-                st.warning("⚠️ Select at least 2 features")
+                st.warning("⚠️ Pilih minimal 2 fitur")
 
 
 # HALAMAN HASIL (RESULTS)
@@ -431,7 +431,7 @@ elif page == "📊 Hasil":
     st.markdown("---")
     
     if st.session_state.clusters is None:
-        st.warning("⚠️ Jalankan Clustering terlebih dahulu")
+        st.warning("⚠️ Jalankan clustering terlebih dahulu")
     else:
         df = st.session_state.data
         clusters = st.session_state.clusters
@@ -450,7 +450,7 @@ elif page == "📊 Hasil":
         # VISUALISASI PCA (2D)
         # ---------------------------------------
         if hasattr(st.session_state, 'X_pca'):
-            st.markdown("### 📈 PCA Visualization")
+            st.markdown("### 📈 Visualisasi PCA")
             
             pca_df = pd.DataFrame({
                 'PC1': st.session_state.X_pca[:, 0],
@@ -460,10 +460,19 @@ elif page == "📊 Hasil":
             
             fig = px.scatter(
                 pca_df, x='PC1', y='PC2', color='Cluster',
-                title=f"{st.session_state.algorithm} Clustering Results",
+                title=f"Hasil Clustering {st.session_state.algorithm}",
                 color_continuous_scale="Viridis"
             )
-            fig.update_layout(height=500, template="plotly_dark")
+            
+            unique_clusters = sorted(pca_df['Cluster'].unique())
+            fig.update_layout(
+                height=500, 
+                template="plotly_dark",
+                coloraxis_colorbar=dict(
+                    tickvals=unique_clusters,
+                    ticktext=[str(int(c)) for c in unique_clusters]
+                )
+            )
             st.plotly_chart(fig, use_container_width=True)
             
             st.markdown("---")
@@ -476,48 +485,65 @@ elif page == "📊 Hasil":
         
         fig = px.bar(
             x=cluster_counts.index, y=cluster_counts.values,
-            labels={'x': 'Cluster', 'y': 'Count'},
-            title="Films per Cluster",
+            labels={'x': 'Cluster', 'y': 'Jumlah'},
+            title="Film per Cluster",
             color=cluster_counts.index,
             color_continuous_scale="Viridis"
         )
-        fig.update_layout(showlegend=False, height=400, template="plotly_dark")
+        fig.update_layout(
+            showlegend=False, 
+            height=400, 
+            template="plotly_dark",
+            coloraxis_colorbar=dict(
+                tickmode='linear',
+                tick0=0,
+                dtick=1,
+                tickvals=sorted(cluster_counts.index.tolist()),
+                ticktext=[str(int(i)) for i in sorted(cluster_counts.index.tolist())]
+            )
+        )
+        fig.update_xaxes(
+            tickmode='linear',
+            tick0=min(cluster_counts.index),
+            dtick=1,
+            tickvals=sorted(cluster_counts.index.tolist())
+        )
         st.plotly_chart(fig, use_container_width=True)
         
         # Statistik dan export data
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("### 📊 Cluster statistik")
-            cluster_stats = df_clustered.groupby('Cluster').size().reset_index(name='Count')
-            cluster_stats['Percentage'] = (cluster_stats['Count'] / len(df_clustered) * 100).round(1)
+            st.markdown("### 📊 Statistik Cluster")
+            cluster_stats = df_clustered.groupby('Cluster').size().reset_index(name='Jumlah')
+            cluster_stats['Persentase'] = (cluster_stats['Jumlah'] / len(df_clustered) * 100).round(1)
             st.dataframe(cluster_stats, use_container_width=True)
         
         with col2:
-            st.markdown("### 📥 Export Data")
+            st.markdown("### 📥 Ekspor Data")
             csv = df_clustered.to_csv(index=False)
             st.download_button(
-                label="📥 Download CSV",
+                label="📥 Unduh CSV",
                 data=csv,
-                file_name="clustered_films.csv",
+                file_name="film_clustering.csv",
                 mime="text/csv",
                 use_container_width=True
             )
         
         # Preview data lengkap
         st.markdown("---")
-        st.markdown("### 👀 Full Dataset")
+        st.markdown("### 👀 Dataset Lengkap")
         st.dataframe(df_clustered, use_container_width=True)
 
 
 # HALAMAN EVALUATION
 elif page == "📈 Evaluasi":
-    st.markdown("# 📈 Evaluasi Metrik")
+    st.markdown("# 📈 Metrik Evaluasi")
     st.markdown("---")
     
     # Pastikan clustering sudah dijalankan
     if st.session_state.clusters is None:
-        st.warning("⚠️ Run clustering first")
+        st.warning("⚠️ Jalankan clustering terlebih dahulu")
     else:
         # Ambil data hasil scaling dan label cluster dari session
         X_scaled = st.session_state.scaled_data
@@ -534,7 +560,7 @@ elif page == "📈 Evaluasi":
             
             # Jika jumlah cluster < 2, evaluasi tidak valid
             if len(set(clusters_eval)) < 2:
-                st.warning("⚠️ Not enough clusters (excluding noise) for evaluation")
+                st.warning("⚠️ Cluster tidak cukup (tidak termasuk noise) untuk evaluasi")
             else:
                 # Hitung metrik evaluasi
                 silhouette = silhouette_score(X_eval, clusters_eval)
@@ -549,7 +575,7 @@ elif page == "📈 Evaluasi":
                     st.metric("📊 Davies-Bouldin Index", f"{davies_bouldin:.4f}", help="Semakin rendah semakin baik (<1.0)")
                 with col3:
                     n_noise = list(clusters).count(-1)
-                    st.metric("🔴 Noise Points", n_noise)
+                    st.metric("🔴 Titik Noise", n_noise)
         
         # ===============================
         #  Evaluasi untuk K-MEANS
@@ -561,9 +587,9 @@ elif page == "📈 Evaluasi":
             col1, col2 = st.columns(2)
             
             with col1:
-                st.metric("🎯 Silhouette Score", f"{silhouette:.4f}", help="Higher is better (>0.5)")
+                st.metric("🎯 Silhouette Score", f"{silhouette:.4f}", help="Semakin tinggi semakin baik (>0.5)")
             with col2:
-                st.metric("📊 Davies-Bouldin Index", f"{davies_bouldin:.4f}", help="Lower is better (<1.0)")
+                st.metric("📊 Davies-Bouldin Index", f"{davies_bouldin:.4f}", help="Semakin rendah semakin baik (<1.0)")
         
         # -------------------------------------------
         # Penjelasan interpretasi metrik secara visual
@@ -575,17 +601,17 @@ elif page == "📈 Evaluasi":
         with col1:
             st.markdown("""
             ### 🎯 Silhouette Score
-            - **> 0.5**: ✅ Good → cluster terbentuk jelas dan terpisah.
-            - **0.25 - 0.5**: ⚠️ Fair → cluster agak tumpang tindih.
-            - **< 0.25**: ❌ Poor → cluster buruk atau data acak.
+            - **> 0.5**: ✅ Bagus → cluster terbentuk jelas dan terpisah.
+            - **0.25 - 0.5**: ⚠️ Cukup → cluster agak tumpang tindih.
+            - **< 0.25**: ❌ Buruk → cluster buruk atau data acak.
             """)
         
         with col2:
             st.markdown("""
             ### 📊 Davies-Bouldin Index
-            - **< 1.0**: ✅ Excellent → cluster sangat terpisah.
-            - **1.0 - 2.0**: ✅ Good → cukup bagus.
-            - **> 2.0**: ❌ Poor → cluster tumpang tindih atau tidak jelas.
+            - **< 1.0**: ✅ Sempurna → cluster sangat terpisah.
+            - **1.0 - 2.0**: ✅ Bagus → cukup bagus.
+            - **> 2.0**: ❌ Buruk → cluster tumpang tindih atau tidak jelas.
             """)
 
 
@@ -598,7 +624,7 @@ elif page == "💡 Interpretasi":
     st.markdown("---")
     
     if st.session_state.clusters is None:
-        st.warning("⚠️ Run clustering first")
+        st.warning("⚠️ Jalankan clustering terlebih dahulu")
     else:
         df = st.session_state.data
         clusters = st.session_state.clusters
@@ -667,7 +693,7 @@ elif page == "💡 Interpretasi":
                         <div style='display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;'>
                             <div>
                                 <h3 style='margin: 0; color: {color}; font-size: 1.2rem;'>{summary}</h3>
-                                <p style='margin: 0.5rem 0 0 0; color: #94a3b8; font-size: 0.9rem;'>{size} films • {pct:.1f}% dari total</p>
+                                <p style='margin: 0.5rem 0 0 0; color: #94a3b8; font-size: 0.9rem;'>{size} film • {pct:.1f}% dari total</p>
                             </div>
                             <div style='
                                 background: {color}20;
@@ -701,8 +727,12 @@ elif page == "💡 Interpretasi":
                         st.markdown("**🎬 Genre Dominan:**")
                         if genre_analysis and genre_analysis.get('dominant_genres'):
                             genres = genre_analysis['dominant_genres']
-                            if genres:
+                            if isinstance(genres, list) and len(genres) > 0:
                                 st.markdown(f"• {genres[0]}")
+                            elif isinstance(genres, str):
+                                st.markdown(f"• {genres}")
+                            else:
+                                st.markdown("• Data genre tidak tersedia")
                         else:
                             st.markdown("• Data genre tidak tersedia")
                     
@@ -712,8 +742,8 @@ elif page == "💡 Interpretasi":
                     with st.expander("📈 Statistik Detail", expanded=False):
                         stats_df = pd.DataFrame([
                             {
-                                'Feature': feature,
-                                'Mean': f"{data['mean']:.2f}",
+                                'Fitur': feature,
+                                'Rata-rata': f"{data['mean']:.2f}",
                                 'Min': f"{data['min']:.2f}",
                                 'Max': f"{data['max']:.2f}",
                                 'Std': f"{data['std']:.2f}"
@@ -726,7 +756,7 @@ elif page == "💡 Interpretasi":
                         if genre_analysis and genre_analysis.get('genre_distribution'):
                             st.markdown("**Distribusi Genre:**")
                             genre_df = pd.DataFrame([
-                                {'Genre': g, 'Count': c}
+                                {'Genre': g, 'Jumlah': c}
                                 for g, c in sorted(genre_analysis['genre_distribution'].items(), key=lambda x: x[1], reverse=True)
                             ])
                             st.dataframe(genre_df, use_container_width=True)
@@ -745,15 +775,15 @@ elif page == "💡 Interpretasi":
                     st.metric("Total Cluster", len(insights_data))
                 with summary_col2:
                     total_films = sum(i['size'] for i in insights_data)
-                    st.metric("Total Films", total_films)
+                    st.metric("Total Film", total_films)
                 with summary_col3:
                     noise_count = sum(i['size'] for i in insights_data if i['cluster_id'] == -1)
-                    st.metric("Noise Points", noise_count if noise_count > 0 else 0)
+                    st.metric("Titik Noise", noise_count if noise_count > 0 else 0)
             
             else:
                 # Jika backend gagal mengirim respon
-                st.error("Could not fetch insights from backend")
+                st.error("Tidak dapat mengambil insights dari backend")
         
         except Exception as e:
             # Jika ada error (misal backend mati)
-            st.error(f"Error fetching insights: {str(e)}")
+            st.error(f"Error mengambil insights: {str(e)}")
