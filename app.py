@@ -80,7 +80,6 @@ with st.sidebar:
         -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;'>
             🎬 FilmCluster
         </h2>
-        <p style='color: #94a3b8; font-size: 0.8rem; margin-top: 0.5rem;'>Advanced Analytics</p>
     </div>
     """, unsafe_allow_html=True)
     
